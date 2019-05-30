@@ -1,4 +1,4 @@
-# maple-mange
+# maple-manga
 Manga subscriptions management.
 ## TODO
 >Test
