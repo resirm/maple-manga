@@ -1,9 +1,18 @@
+'use strict';
 var express = require('express')
 var bodyParser = require("body-parser"); 
 var app = express()
 var path = require('path')
 var cheerio = require('cheerio');
 var https = require('https');
+
+const mysql = require('mysql')
+var con = mysql.createConnection({
+    host: 'localhost',
+    user: 'ta78na',
+    password: 'ta78na',
+    database: 'maple',
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'res')));
@@ -56,3 +65,39 @@ var server = app.listen(3000, function () {
     console.log(`应用实例，访问地址为 http://${ host==='::'?'localhost':host}:${port}`);
     //console.log(`Current path: ${__dirname}`);
 })
+
+let update_checker = setInterval(() => {
+  if(con.state !== 'authenticated'){
+    con.connect();
+  }
+  console.log(con.state);
+  const QUERY = 'SELECT * FROM manga;';
+  let mangas;
+  con.query(QUERY, (err, res, fields) => {
+    if(err){
+      console.log(`Error occurred when trying to get manga information from database: ${err.message}`);
+      return;
+    }
+    mangas = res;
+    mangas.forEach(manga => {
+      https.get(manga.url, function(res){
+        var chunks = [];
+        var size = 0;
+        res.on('data', function(chunk){
+            chunks.push(chunk);
+            size += chunk.length;
+        });
+        
+        res.on('end', function(){
+            var data = Buffer.concat(chunks, size);
+            var html = data.toString();
+            var $ = cheerio.load(html);
+            
+            let update_time = $("span.zj_list_head_dat").text();
+            console.log(`update_time: ${update_time}`);
+          });
+        });
+    });
+  });
+}, 5000);
+
