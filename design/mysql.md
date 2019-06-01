@@ -1,6 +1,6 @@
 # Database Design
 ***
-##Tables
+## Tables
 * **user**
 
 |用户id|用户名|电子邮箱|
