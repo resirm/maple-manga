@@ -95,9 +95,21 @@ let update_checker = setInterval(() => {
             
             let update_time = $("span.zj_list_head_dat").text();
             console.log(`update_time: ${update_time}`);
+            if (update_time.split(' ')[1] !== manga.update_time){
+              const UPDATE = `UPDATE manga set update_time = "${update_time.split(' ')[1]}";`;
+              console.log(UPDATE);
+              console.log(`${manga.manga_name} updated at: ${update_time.split(' ')[1]}.`)
+              console.log(update_time.split(' ')[1]);
+              con.query(UPDATE, (err, res, fields) => {
+                if(err){
+                  console.log(`Error occurred when trying to get manga information from database: ${err.message}`);
+                  return;
+                }
+                console.table(res);
+              })
+            }
           });
         });
     });
   });
 }, 5000);
-
