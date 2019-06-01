@@ -87,7 +87,7 @@ app.post('/result' , function(req,res){
        });
     });
     });
-
+    res.send("nice");
 });
 
 app.post('/search', function(req, res) {
