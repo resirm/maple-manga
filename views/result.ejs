@@ -2,22 +2,40 @@
 <html>
   <head>
     <title>Maple Manga</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="css/common.css" rel="stylesheet" media="screen">
   </head>
   <body>
-    <h1 class="text-center">搜索结果</h1>
+      <script type="text/javascript">
+        function t(para) {
+
+          $.ajax({
+            method: 'post',
+            url: '/result',
+            data: para,
+            success: function(res){
+              alert("订阅成功");
+        }
+    });
+        }
+    </script>
+    <div class="row">
+      <a href="/"><button type="button" class="btn btn-default col-md-1 col-sm-1" aria-label="Left Align">
+          <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>返回
+        </button></a>
+    </div>
     <div class="UpdateList">
 
       <% for (var manga in mangas) { %>
-    <div class="clearfix itemBox" data-key="3631">
+    <div class="clearfix itemBox">
       <div class="itemImg">
           <img src="<%= mangas[manga].pic %>" width="100%" alt="" default="images/default/cover.png"></a></div>
       <div class="itemTxt">
           <a class="title" href="<%= mangas[manga].link %>"><%= mangas[manga].name %></a>
-          <button class="btn btn-primary">添加订阅</button>
+          <button class="btn btn-primary" onclick="t({pic:'<%= mangas[manga].pic %>', name:'<%= mangas[manga].name %>', link:'<%= mangas[manga].link %>'})" >添加订阅</button>
       </div>
     </div>
       <% } %>
