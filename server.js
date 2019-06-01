@@ -11,7 +11,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.get('/' , (req,res) => res.render('search') );
 
-app.get('/result' , (req,res) = {} );
+app.get('/result' , (req,res) => { 
+  res.status(404).send(`<html><head><meta http-equiv="refresh" content="5;url=http://localhost:3000"></head><body><h1>请从搜索框进行搜索！</h1><p>5秒钟后跳转...</p></body></html>`);
+});
 
 app.post('/search', function(req, res) {
   var para = req.body.search;
