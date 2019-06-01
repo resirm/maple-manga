@@ -3,19 +3,15 @@ var bodyParser = require("body-parser");
 var app = express()
 var path = require('path')
 var cheerio = require('cheerio');
-var http = require('https');
+var https = require('https');
 
-app.use(bodyParser.urlencoded({ extended: false }));  
-app.use(express.static(__dirname + '/res'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'res')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.get('/' , function(req,res){
-    res.render('search');
-});
+app.get('/' , (req,res) => res.render('search') );
 
-app.get('/result' , function(req,res){
-  
-});
+app.get('/result' , (req,res) = {} );
 
 app.post('/search', function(req, res) {
   var para = req.body.search;
@@ -24,7 +20,7 @@ app.post('/search', function(req, res) {
   var url = 'https://www.manhuafen.com/search/?keywords='+encodeURI(para);
   console.log(url);
   
-  http.get(url, function(res){
+  https.get(url, function(res){
     var chunks = [];
     var size = 0;
     res.on('data', function(chunk){
@@ -51,11 +47,10 @@ app.post('/search', function(req, res) {
     
   });
 });
+
 var server = app.listen(3000, function () {
- 
     var host = server.address().address;
     var port = server.address().port;
-   
-    console.log("应用实例，访问地址为 http://%s:%s", host, port);
-   
-  })
+    console.log(`应用实例，访问地址为 http://${ host==='::'?'localhost':host}:${port}`);
+    //console.log(`Current path: ${__dirname}`);
+})
