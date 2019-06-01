@@ -96,7 +96,7 @@ let update_checker = setInterval(() => {
             let update_time = $("span.zj_list_head_dat").text();
             console.log(`update_time: ${update_time}`);
             if (update_time !== manga.update_time){
-              const UPDATE = `UPDATE manga set update_time = "${update_time}";`;
+              const UPDATE = `UPDATE manga set update_time = "${update_time}" WHERE manga_id = ${manga.manga_id};`;
               console.log(UPDATE);
               console.log(`${manga.manga_name} updated at: ${update_time}.`)
               console.log(update_time);
