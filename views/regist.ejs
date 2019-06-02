@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>My Login Page &mdash; Bootstrap 4 Login Page Snippet</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/my-login.css">
+   <script type="text/javascript">
+        function regist() {
+            $.ajax({
+            //几个参数需要注意一下
+                type: "POST",//方法类型
+                url: "/registHandle" ,//url
+                data: $('#regs').serialize(),
+                success: function (result) {
+                    alert(result);
+                },
+                error: function() {
+                    alert("异常！");
+                }
+            });
+        }
+
+    </script>
+</head>
+<body class="my-login-page">
+	
+		<div class="container">
+			<div class="row justify-content-md-center ">
+				<div class="card-wrapper">
+			 		<div class="brand">
+						<img src="img/logo.jpg">
+					</div>
+					<div class="card fat" style="margin-top:40px ">
+						<div class="card-body">
+							<h4 class="card-title text-center">注册</h4>
+							<form id="regs" method="POST">
+							 
+								<div class="form-group">
+									<label for="name">用户名</label>
+									<input id="name" type="text" class="form-control" name="username" required autofocus>
+								</div>
+
+								<div class="form-group">
+									<label for="email">邮箱</label>
+									<input id="email" type="text" class="form-control" name="email" >
+								</div>
+
+								<div class="form-group">
+									<label for="password">密码</label>
+									<input id="password" type="password" class="form-control" name="password" required data-eye>
+								</div>
+
+								</form>
+								<div class="form-group no-margin">
+									<button type="botton" class="btn btn-primary btn-block" onclick="regist()">
+										注册
+									</button>
+								</div>
+							
+						</div>
+					</div>
+	 				<div class="footer">
+						Copyright &copy; 2019 &mdash; Maple Manga
+					</div> 
+				</div>
+			</div>
+		</div>
+	
+
+	<script src="js/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/my-login.js"></script>
+</body>
+</html>

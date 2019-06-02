@@ -29,6 +29,7 @@ app.use(session({
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
 app.get('/' , function(req,res){
     var usr = req.query.usr;
     console.log(usr);
@@ -106,11 +107,38 @@ app.post('/result' , function(req,res){
     res.send("nice");
 });
 
+app.get('/regist', function(req, res) {
+  res.render('regist');
+});
+
+app.post('/registHandle', function(req, res) {
+  let uname = req.body.username;
+  let uemail = req.body.email;
+  let upass = req.body.password;
+
+  if (upass != "zyfsmalldick")
+  res.send("SB, GET OUT OF HERE!");
+  else{
+    let newuser = `insert into user values(null,"${uname}","${uemail}")`;
+    con.query(newuser, (err, ress) => {
+      if(err){
+        console.log(`Error occurred when trying to insert new user: ${err.message}`);
+        res.send("失败，用户名重复");
+        return;
+      }
+        res.send("注册成功，baby");
+      console.log(`new user: "${uname}"`);
+    });
+  }
+  
+});
+
+
+
 app.post('/search', function(req, res) {
   var para = req.body.search;
   console.log(req.session.userName);
   var usrname = req.session.userName;
-  var m_id = req.body.m_id;
   var mangas = [];
   var m = res;
   var url = 'https://www.manhuafen.com/search/?keywords='+encodeURI(para);
