@@ -38,14 +38,38 @@ app.get('/' , function(req,res){
     // sql2: select * from manga as m where m.manga_id in (select sub.manga_id from subscription as sub join user as u where           sub.user_id = u.user_id and u.user_name = 'ta78na');
     // use sql2;
     const query_subscription = `SELECT * FROM manga AS m WHERE m.manga_id IN (SELECT sub.manga_id FROM subscription AS sub JOIN user AS u WHERE sub.user_id = u.user_id AND u.user_name = '${ usr }');`;
+    
     let mangas;
     con.query(query_subscription, (err, ress, fields) => {
       if(err){
         console.log(`Error occurred when trying to get subscription information from database: ${err.message}`);
         return;
       }
-      mangas = ress;
-      res.render('index',{usr, mangas});
+      const QUERY_SUB_NEW = `SELECT sub.manga_id FROM subscription as sub JOIN manga AS m WHERE sub.user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usr }') AND m.manga_id = sub.manga_id and m.update_time <> sub.seen_time;`
+      con.query(QUERY_SUB_NEW, (err, resss, fields) => {
+        if(err){
+          console.log(`Error occurred when trying to get subscription information from database: ${err.message}`);
+          return;
+        }
+        let updated = [];
+        resss.forEach(manga => {
+          console.log(manga);
+          updated.push(manga.manga_id);
+        });
+        console.log(updated);
+        ress.forEach(manga => {
+          if(updated.indexOf(manga.manga_id) != -1){
+            manga.update = true;
+          }else{
+            manga.update = false;
+          }
+          console.log(manga.manga_id, manga.update);
+        });
+        ress.sort((a, b) => b.update - a.update);
+        console.log(ress, typeof ress);
+        mangas = ress;
+        res.render('index',{usr, mangas});
+      })
     });
 });
 

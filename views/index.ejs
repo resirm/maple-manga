@@ -29,8 +29,14 @@
       <h1>欢迎你 <%= usr %> </h1>
       <ul class="col_3_1">
         <% for (var manga in mangas) { %>
-          <li class="list-comic"><a class="ImgA" onclick="see({m_id: '<%= mangas[manga].manga_id%>'})" href="<%= mangas[manga].url%>" target="_blank"><img src="<%= mangas[manga].cover_url%>" width="100%" alt="" default="images/default/cover.png"></a><a class="txtA" href="https://m.manhuafen.com/comic/11/"><%= mangas[manga].manga_name%></a><span class="info">更新了<a href="/comic/11/257032.html">238话</a></span>
-          </li>
+          <% if (mangas[manga].update === true ) { %>
+            <span style="color: #ff0000;"><li class="list-comic"><a class="ImgA" onclick="see({m_id: '<%= mangas[manga].manga_id%>'})" href="<%= mangas[manga].url%>" target="_blank"><img src="<%= mangas[manga].cover_url%>" width="100%" alt="" default="images/default/cover.png"></a><a class="txtA" href="https://m.manhuafen.com/comic/11/" style="color: #ff0000;"><%= mangas[manga].manga_name+'（新！）'%></a><span class="info">更新了<a href="/comic/11/257032.html">238话</a></span>
+            </li>
+            </span>
+          <% } else { %>
+            <li class="list-comic"><a class="ImgA" onclick="see({m_id: '<%= mangas[manga].manga_id%>'})" href="<%= mangas[manga].url%>" target="_blank"><img src="<%= mangas[manga].cover_url%>" width="100%" alt="" default="images/default/cover.png"></a><a class="txtA" href="https://m.manhuafen.com/comic/11/"><%= mangas[manga].manga_name%></a><span class="info">更新了<a href="/comic/11/257032.html">238话</a></span>
+            </li>
+          <% } %>
         <% } %>
       </ul>
     </div>
