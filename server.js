@@ -10,8 +10,8 @@ var http = require('http')
 const mysql = require('mysql')
 var con = mysql.createConnection({
     host: 'localhost',
-    user: 'root',
-    password: 'wsn',
+    user: 'ta78na',
+    password: 'ta78na',
     database: 'maple',
 });
 
@@ -140,7 +140,7 @@ app.post('/registHandle', function(req, res) {
   let uemail = req.body.email;
   let upass = req.body.password;
 
-  if (upass != "zyfsmalldick")
+  if (upass != "daddyplease")
   res.send("SB, GET OUT OF HERE!");
   else{
     let newuser = `insert into user values(null,"${uname}","${uemail}")`;
