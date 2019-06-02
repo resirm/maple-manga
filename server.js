@@ -6,12 +6,12 @@ var path = require('path')
 var cheerio = require('cheerio');
 var https = require('https');
 var session = require('express-session');
-
+var http = require('http')
 const mysql = require('mysql')
 var con = mysql.createConnection({
     host: 'localhost',
-    user: 'ta78na',
-    password: 'ta78na',
+    user: 'root',
+    password: 'wsn',
     database: 'maple',
 });
 
@@ -157,6 +157,48 @@ app.post('/registHandle', function(req, res) {
   
 });
 
+//盗图
+app.get('/img', function(req, ress) {
+  let url = req.query.url;
+  let reg = /^http(s)?:\/\/(.*?)\/(.*)/
+  let host = reg.exec(url)[2];
+  let p = '/'+ reg.exec(url)[3];
+  let h = reg.exec(url)[1];
+  var option={
+    hostname:host,
+    path:p,
+    headers:{
+      'Referer':'https://www.manhuafen.com'
+      
+    }
+  };
+  if(h == 's')
+https.get(option,function(res){
+  var chunks = [];
+  var img;
+  res.on('data',function(chunk){
+    chunks.push(chunk);
+  });
+  res.on('end',function(){
+    img = Buffer.concat(chunks);
+    ress.write(img);
+    ress.end();
+  });
+  });
+  else 
+  http.get(option,function(res){
+    var chunks = [];
+    var img;
+    res.on('data',function(chunk){
+      chunks.push(chunk);
+    });
+    res.on('end',function(){
+      img = Buffer.concat(chunks);
+      ress.write(img);
+      ress.end();
+    });
+    });
+});
 
 
 app.post('/search', function(req, res) {
@@ -182,11 +224,19 @@ app.post('/search', function(req, res) {
         var $ = cheerio.load(html);
         
         $("li.list-comic").each( function(){
-            var manga = {};
-            manga.pic = $(this).find("img").attr("src");
-            manga.name = $(this).find("a.image-link").attr("title");
-            manga.link = $(this).find("a.image-link").attr("href");
-            mangas.push(manga);
+          var manga = {};
+          let reg = /^http(s)?:\/\/(.*?)\/(.*)/
+          let link;
+          link = $(this).find("img").attr("src");
+          manga.name = $(this).find("a.image-link").attr("title");
+          manga.link = $(this).find("a.image-link").attr("href");
+          
+          if (link.search(reg) == -1)
+          {manga.pic = link;}
+          else
+          {manga.pic = "img?url=" + link}
+          
+          mangas.push(manga);
             // console.log(manga);
         });
         m.render('result', {mangas:mangas, usrname});
