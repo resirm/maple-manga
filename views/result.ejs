@@ -23,7 +23,7 @@
         }
     </script>
     <div class="row">
-      <a href="/"><button type="button" class="btn btn-default col-md-1 col-sm-1" aria-label="Left Align">
+      <a href="/?usr=<%= usrname %>""><button type="button" class="btn btn-default col-md-1 col-sm-1" aria-label="Left Align">
           <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>返回
         </button></a>
     </div>
@@ -32,7 +32,7 @@
       <% for (var manga in mangas) { %>
     <div class="clearfix itemBox">
       <div class="itemImg">
-          <img src="<%= mangas[manga].pic %>" width="100%" alt="" default="images/default/cover.png"></a></div>
+          <img src="<%= mangas[manga].pic %>" width="100%" onerror="this.src='img/cover.png'"></a></div>
       <div class="itemTxt">
           <a class="title" href="<%= mangas[manga].link %>"><%= mangas[manga].name %></a>
           <button class="btn btn-primary" onclick="t({pic:'<%= mangas[manga].pic %>', name:'<%= mangas[manga].name %>', link:'<%= mangas[manga].link %>'})" >添加订阅</button>
