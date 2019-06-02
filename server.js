@@ -33,7 +33,20 @@ app.get('/' , function(req,res){
     var usr = req.query.usr;
     console.log(usr);
     req.session.userName = usr;
-    res.render('search',{usr:usr});
+    // sql1: select m.* from subscription as sub join user as u join manga as m where sub.user_id = u.user_id 
+    //       and u.user_name = 'ta78na' and sub.manga_id = m.manga_id;
+    // sql2: select * from manga as m where m.manga_id in (select sub.manga_id from subscription as sub join user as u where  //       sub.user_id = u.user_id and u.user_name = 'ta78na');
+    // use sql2;
+    const query_subscription = `SELECT * FROM manga AS m WHERE m.manga_id IN (SELECT sub.manga_id FROM subscription AS sub JOIN user AS u WHERE sub.user_id = u.user_id AND u.user_name = '${ usr }');`;
+    let mangas;
+    con.query(query_subscription, (err, ress, fields) => {
+      if(err){
+        console.log(`Error occurred when trying to get subscription information from database: ${err.message}`);
+        return;
+      }
+      mangas = ress;
+      res.render('search',{usr, mangas});
+    });
 });
 
 app.post('/result' , function(req,res){
