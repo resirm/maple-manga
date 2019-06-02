@@ -33,9 +33,8 @@ app.get('/' , function(req,res){
     var usr = req.query.usr;
     console.log(usr);
     req.session.userName = usr;
-    // sql1: select m.* from subscription as sub join user as u join manga as m where sub.user_id = u.user_id 
-    //       and u.user_name = 'ta78na' and sub.manga_id = m.manga_id;
-    // sql2: select * from manga as m where m.manga_id in (select sub.manga_id from subscription as sub join user as u where  //       sub.user_id = u.user_id and u.user_name = 'ta78na');
+    // sql1: select m.* from subscription as sub join user as u join manga as m where sub.user_id = u.user_id and u.user_name          = 'ta78na' and sub.manga_id = m.manga_id;
+    // sql2: select * from manga as m where m.manga_id in (select sub.manga_id from subscription as sub join user as u where           sub.user_id = u.user_id and u.user_name = 'ta78na');
     // use sql2;
     const query_subscription = `SELECT * FROM manga AS m WHERE m.manga_id IN (SELECT sub.manga_id FROM subscription AS sub JOIN user AS u WHERE sub.user_id = u.user_id AND u.user_name = '${ usr }');`;
     let mangas;
@@ -45,7 +44,7 @@ app.get('/' , function(req,res){
         return;
       }
       mangas = ress;
-      res.render('search',{usr, mangas});
+      res.render('index',{usr, mangas});
     });
 });
 
@@ -111,6 +110,7 @@ app.post('/search', function(req, res) {
   var para = req.body.search;
   console.log(req.session.userName);
   var usrname = req.session.userName;
+  var m_id = req.body.m_id;
   var mangas = [];
   var m = res;
   var url = 'https://www.manhuafen.com/search/?keywords='+encodeURI(para);
@@ -139,6 +139,33 @@ app.post('/search', function(req, res) {
         });
         m.render('result', {mangas:mangas, usrname});
     });
+  });
+});
+
+app.post('/seen', function(req, res) {
+  console.log(req.session.userName);
+  var usrname = req.session.userName;
+  console.log(req.session.userName);
+  var m_id = req.body.m_id;
+  const CHECK_UPDATE_TIME = `SELECT m.update_time, sub.seen_time FROM subscription as sub JOIN manga AS m WHERE sub.user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usrname }') AND m.manga_id = sub.manga_id AND m.manga_id = ${ m_id };`;
+  con.query(CHECK_UPDATE_TIME, (err, ress, fields) => {
+    if(err){
+      console.log(`Error occurred when trying to get seen_time information from database: ${err.message}`);
+      return;
+    }
+    ress.forEach(time_res => {
+      console.table(time_res);
+      if(time_res.update_time !== time_res.seen_time){
+        const UPDATE_SEEN_TIME = `UPDATE subscription SET seen_time = '${ time_res.update_time }' WHERE manga_id = ${ m_id };`;
+        con.query(UPDATE_SEEN_TIME, (err, upres, fields) => {
+          if(err){
+            console.log(`Error occurred when trying to update seen_time information from database: ${err.message}`);
+            return;
+          }
+          console.log(`updated seen_time for manga_id: ${ m_id }.`);
+        });
+      }
+    })
   });
 });
 
