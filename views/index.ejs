@@ -6,7 +6,7 @@
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="css/common.css" rel="stylesheet" media="screen">
-    <base target="_blank">
+    <!-- <base target="_blank"> -->
   </head>
   <body>
     <script type="text/javascript">
@@ -29,7 +29,7 @@
       <h1>欢迎你 <%= usr %> </h1>
       <ul class="col_3_1">
         <% for (var manga in mangas) { %>
-          <li class="list-comic"><a class="ImgA" onclick="see({m_id: '<%= mangas[manga].manga_id%>'})" href="<%= mangas[manga].url%>"><img src="<%= mangas[manga].cover_url%>" width="100%" alt="" default="images/default/cover.png"></a><a class="txtA" href="https://m.manhuafen.com/comic/11/"><%= mangas[manga].manga_name%></a><span class="info">更新了<a href="/comic/11/257032.html">238话</a></span>
+          <li class="list-comic"><a class="ImgA" onclick="see({m_id: '<%= mangas[manga].manga_id%>'})" href="<%= mangas[manga].url%>" target="_blank"><img src="<%= mangas[manga].cover_url%>" width="100%" alt="" default="images/default/cover.png"></a><a class="txtA" href="https://m.manhuafen.com/comic/11/"><%= mangas[manga].manga_name%></a><span class="info">更新了<a href="/comic/11/257032.html">238话</a></span>
           </li>
         <% } %>
       </ul>
