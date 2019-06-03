@@ -11,7 +11,7 @@ const mysql = require('mysql')
 var con = mysql.createConnection({
     host: 'localhost',
     user: 'ta78na',
-    password: 'ta78na',
+    password: 'Ch1Ch2ch#',
     database: 'maple',
 });
 
@@ -24,7 +24,7 @@ app.use(session({
   resave : true,
   saveUninitialized: false, // 是否保存未初始化的会话
   cookie : {
-      maxAge : 1000 * 60 * 3, // 设置 session 的有效时间，单位毫秒
+      maxAge : 1000 * 60 * 60 * 24 * 7, // 设置 session 的有效时间，单位毫秒
   },
 }));
 
@@ -35,6 +35,11 @@ app.set('view engine', 'ejs');
 app.get('/' , function(req,res){
     var usr = req.query.usr;
     console.log(usr);
+    if(usr == undefined)
+	{
+		res.send("sb,gun.");
+		res.end();	
+	}
     req.session.userName = usr;
     // sql1: select m.* from subscription as sub join user as u join manga as m where sub.user_id = u.user_id and u.user_name          = 'ta78na' and sub.manga_id = m.manga_id;
     // sql2: select * from manga as m where m.manga_id in (select sub.manga_id from subscription as sub join user as u where           sub.user_id = u.user_id and u.user_name = 'ta78na');
@@ -115,7 +120,7 @@ app.post('/result' , function(req,res){
                return;
               } 
               // debug
-              console.table(result);
+              //console.table(result);
               let usrid = result[0].user_id;
             
               //插入订阅
@@ -166,7 +171,8 @@ app.get('/img', function(req, ress) {
   let host = reg.exec(url)[2];
   let p = '/'+ reg.exec(url)[3];
   let h = reg.exec(url)[1];
-  var option={
+  let rq;
+    var option={
     hostname:host,
     path:p,
     headers:{
@@ -175,7 +181,7 @@ app.get('/img', function(req, ress) {
     }
   };
   if(h == 's')
-https.get(option,function(res){
+ rq = https.get(option,function(res){
   var chunks = [];
   var img;
   res.on('data',function(chunk){
@@ -188,7 +194,7 @@ https.get(option,function(res){
   });
   });
   else 
-  http.get(option,function(res){
+  rq = http.get(option,function(res){
     var chunks = [];
     var img;
     res.on('data',function(chunk){
@@ -200,6 +206,10 @@ https.get(option,function(res){
       ress.end();
     });
     });
+  rq.on("error", function(e){
+	console.log(JSON.stringify(e));	
+});
+  rq.end();
 });
 
 
@@ -258,7 +268,7 @@ app.post('/seen', function(req, res) {
       return;
     }
     ress.forEach(time_res => {
-      console.table(time_res);
+     // console.table(time_res);
       if(time_res.update_time !== time_res.seen_time){
         const UPDATE_SEEN_TIME = `UPDATE subscription SET seen_time = '${ time_res.update_time }' WHERE manga_id = ${ m_id };`;
         con.query(UPDATE_SEEN_TIME, (err, upres, fields) => {
@@ -273,7 +283,7 @@ app.post('/seen', function(req, res) {
   });
 });
 
-var server = app.listen(3000, function () {
+var server = app.listen(80, function () {
     var host = server.address().address;
     var port = server.address().port;
     console.log(`应用实例，访问地址为 http://${ host==='::'?'localhost':host}:${port}`);
@@ -296,7 +306,7 @@ function check() {
     }
     mangas = res;
     mangas.forEach(manga => {
-      https.get(manga.url, function(res){
+      let rqq = https.get(manga.url, function(res){
         var chunks = [];
         var size = 0;
         res.on('data', function(chunk){
@@ -321,7 +331,7 @@ function check() {
                   console.log(`Error occurred when trying to get manga information from database: ${err.message}`);
                   return;
                 }
-                console.table(res);
+              //  console.table(res);
               })
             }
           });
@@ -339,6 +349,7 @@ function check() {
     clearInterval(update_checker)
     update_checker = setInterval(check, check_update_interval);
   });
+  rqq.end();
 };
 
 // node server.js 2>>log 1>&2 &
