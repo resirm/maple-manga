@@ -15,6 +15,8 @@ var con = mysql.createConnection({
     database: 'maple',
 });
 
+let check_update_interval = 3600000;
+
 app.use(bodyParser.urlencoded({ extended: false }));  
 app.use(express.static(path.join(__dirname, 'res')));
 app.use(session({
@@ -293,7 +295,9 @@ var server = app.listen(80, function () {
     //console.log(`Current path: ${__dirname}`);
 })
 
-let update_checker = setInterval(() => {
+let update_checker = setInterval(check, check_update_interval);
+
+function check() {
   if(con.state !== 'authenticated'){
     con.connect();
   }
@@ -336,8 +340,21 @@ let update_checker = setInterval(() => {
               })
             }
           });
+        }).on('error', (e) => {
+          // 处理error
+          console.log(`get update error: ${e.message}`);
+          check_update_interval = 60000;
+          console.log(`reset check_update_interval: ${check_update_interval}`);
+          clearInterval(update_checker)
+          update_checker = setInterval(check, check_update_interval);
         });
     });
+    check_update_interval = 3600000;
+    console.log(`reset check_update_interval: ${check_update_interval}`);
+    clearInterval(update_checker)
+    update_checker = setInterval(check, check_update_interval);
   });
-	rqq.end();
-}, 3600000);
+  rqq.end();
+};
+
+// node server.js 2>>log 1>&2 &
