@@ -205,8 +205,13 @@ app.get('/img', function(req, ress) {
     });
     });
   rq.on("error", function(e){
-	console.log(JSON.stringify(e));	
+	console.log("###########################req gg#######################");
+	rq.end();	
 });
+	rq.on("timeout",() => { 
+		console.log("###############time out###############");
+		rq.end();
+	});
   rq.end();
 });
 
