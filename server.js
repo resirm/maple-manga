@@ -204,7 +204,9 @@ app.get('/img', function(req, ress) {
       ress.end();
     });
     });
-
+  rq.on("error", function(e){
+	console.log(JSON.stringify(e));	
+});
   rq.end();
 });
 
@@ -300,7 +302,7 @@ let update_checker = setInterval(() => {
     }
     mangas = res;
     mangas.forEach(manga => {
-      let rq = https.get(manga.url, function(res){
+      let rqq = https.get(manga.url, function(res){
         var chunks = [];
         var size = 0;
         res.on('data', function(chunk){
@@ -332,5 +334,5 @@ let update_checker = setInterval(() => {
         });
     });
   });
-	rq.end();
+	rqq.end();
 }, 3600000);
