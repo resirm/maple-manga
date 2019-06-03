@@ -300,7 +300,7 @@ let update_checker = setInterval(() => {
     }
     mangas = res;
     mangas.forEach(manga => {
-      https.get(manga.url, function(res){
+      let rq = https.get(manga.url, function(res){
         var chunks = [];
         var size = 0;
         res.on('data', function(chunk){
@@ -332,4 +332,5 @@ let update_checker = setInterval(() => {
         });
     });
   });
+	rq.end();
 }, 3600000);
