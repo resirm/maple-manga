@@ -207,8 +207,13 @@ app.get('/img', function(req, ress) {
     });
     });
   rq.on("error", function(e){
-	console.log(JSON.stringify(e));	
+	console.log("###########################req gg#######################");
+	rq.end();	
 });
+	rq.on("timeout",() => { 
+		console.log("###############time out###############");
+		rq.end();
+	});
   rq.end();
 });
 
@@ -349,7 +354,6 @@ function check() {
     clearInterval(update_checker)
     update_checker = setInterval(check, check_update_interval);
   });
-  rqq.end();
 };
 
 // node server.js 2>>log 1>&2 &
