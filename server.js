@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
   console.log(usr);
   if(usr == undefined)
   {
-    res.send(`<html><body><div style="text-align:center; ">404</div></body></html>`)
+    res.send(`<html><body><div style="text-align:center; font-size:404px">404</div></body></html>`)
     res.end();
     return;
   }
