@@ -7,6 +7,7 @@ var cheerio = require('cheerio');
 var https = require('https');
 var session = require('express-session');
 var http = require('http')
+var fs = require('fs')
 const mysql = require('mysql')
 var con = mysql.createConnection({
     host: 'localhost',
@@ -97,11 +98,13 @@ let show_home = function (req,res, usr){
   });
 }
 
+//########################添加订阅##########################
 app.post('/result' , function(req,res){
     var username = req.session.userName;
     var mname = req.body.name;
     var mcover = req.body.pic;
     var mlink = req.body.link;
+    let re = /(.*)\/(\d+)\//
     let query_manga = 'select * from manga where manga_name="' + mname +'"';
     con.query(query_manga, (err, resss) => {
       if(err){
