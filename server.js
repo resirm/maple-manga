@@ -107,53 +107,61 @@ app.post('/result' , function(req,res){
       if(err){
         console.log('[QUERY ERROR] - ',err.message);
         return;
-        }
-        if( resss.length == 0){ //没有则插入
-          let mangaaddsql = 'insert into manga(manga_id, manga_name, url, cover_url, update_time) values(null,?,?,?,?)';
-          let mangapara = [mname, mlink, mcover,"time"];
-          con.query(mangaaddsql,mangapara, function (err, re){
-            if(err){
-              console.log('[INSERT ERROR] - ',err.message);
-              return;
-            }
-            //获取漫画id
-            console.log(mname);
-            let qmanga_id = 'select manga_id from manga where manga_name="' + mname + '"';
-            con.query(qmanga_id, (err, ress) => {
-            if(err){
-              console.log('[QUERY ERROR] - ',err.message);
-              return;
-             }
-            console.log(ress);
-            let mangaid =  ress[0].manga_id;
-          
-            //获取用户id
-            let quser = 'select user_id from user where user_name="' + username + '"';
-            con.query(quser, (err, result) => {
-              if(err){
-                console.log('[QUERY ERROR] - ',err.message);
-                return;
-               } 
-               // debug
-               //console.table(result);
-               let usrid = result[0].user_id;
-             
-               //插入订阅
-               let subaddsql = 'insert into subscription (user_id, manga_id, seen_time) values(?,?,?)';
-               let subpara = [usrid, mangaid, "test"];
-               con.query(subaddsql,subpara, (err, res) => {
-                 if(err){
-                   console.log('[INSERT ERROR] - ',err.message);
-                   return;
-                 } 
-               });
-             });
-            });
-          });
-        }
+      }
+      //获取漫画id
+      console.log(mname);
+      let qmanga_id = 'select manga_id from manga where manga_name="' + mname + '"';
+      if(resss.length == 0){ //没有则插入
+        let mangaaddsql = 'insert into manga(manga_id, manga_name, url, cover_url, update_time) values(null,?,?,?,?)';
+        let mangapara = [mname, mlink, mcover,"time"];
+        con.query(mangaaddsql,mangapara, function (err, re){
+          if(err){
+            console.log('[INSERT ERROR] - ',err.message);
+            return;
+          }
+          // 订阅
+          subscibe(qmanga_id, username);
+        });
+      }else{
+        // 订阅
+        subscibe(qmanga_id, username);
+      }
     });
     res.send("nice");
 });
+
+let subscibe = function (qm_id, username){
+  con.query(qm_id, (err, ress) => {
+    if(err){
+      console.log('[QUERY ERROR] - ',err.message);
+      return;
+     }
+    console.log(ress);
+    let mangaid =  ress[0].manga_id;
+
+    //获取用户id
+    let quser = 'select user_id from user where user_name="' + username + '"';
+    con.query(quser, (err, result) => {
+      if(err){
+        console.log('[QUERY ERROR] - ',err.message);
+        return;
+      } 
+      // debug
+      //console.table(result);
+      let usrid = result[0].user_id;
+    
+      //插入订阅
+      let subaddsql = 'insert into subscription (user_id, manga_id, seen_time) values(?,?,?)';
+      let subpara = [usrid, mangaid, "test"];
+      con.query(subaddsql,subpara, (err, res) => {
+        if(err){
+          console.log('[INSERT ERROR] - ',err.message);
+          return;
+        } 
+      });
+    });
+  });
+};
 
 app.get('/regist', function(req, res) {
   res.render('regist');
