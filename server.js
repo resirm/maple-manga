@@ -12,7 +12,7 @@ const mysql = require('mysql')
 var con = mysql.createConnection({
     host: 'localhost',
     user: 'ta78na',
-    password: 'ta78na',
+    password: 'Ch1Ch2ch#',
     database: 'maple',
 });
 
@@ -105,6 +105,10 @@ app.post('/result' , function(req,res){
     var mcover = req.body.pic;
     var mlink = req.body.link;
     let re = /(.*)\/(\d+)\//
+    let r1 = /^http(s)?:\/\/(.*?)\/(.*)/
+    
+    let ms = 'img/' + re.exec(mlink)[2] + ".jpg";
+    
     let query_manga = 'select * from manga where manga_name="' + mname +'"';
     con.query(query_manga, (err, resss) => {
       if(err){
@@ -115,8 +119,30 @@ app.post('/result' , function(req,res){
       console.log(mname);
       let qmanga_id = 'select manga_id from manga where manga_name="' + mname + '"';
       if(resss.length == 0){ //没有则插入
+        if(mcover.search(r1) == -1)
+      {
+          ms = mcover;
+      } else {
+        console.log(mcover);
+        let host = r1.exec(mcover)[2];
+        let p  = '/'+ r1.exec(mcover)[3];
+        let h = r1.exec(mcover)[1];
+       
+        steal(h, host, p, (img) => {
+            fs.open('res/' + ms,'w',(err, fd) => {
+              fs.write(fd, img,(err)=>{
+                  if(err)
+                  {
+                    console.log('download err');
+                  }
+                  console.log('save success');
+                  fs.close(fd,()=>{});
+              });
+            });
+        } );
+      }
         let mangaaddsql = 'insert into manga(manga_id, manga_name, url, cover_url, update_time) values(null,?,?,?,?)';
-        let mangapara = [mname, mlink, mcover,"time"];
+        let mangapara = [mname, mlink, ms,"time"];
         con.query(mangaaddsql,mangapara, function (err, re){
           if(err){
             console.log('[INSERT ERROR] - ',err.message);
@@ -199,42 +225,49 @@ app.get('/img', function(req, ress) {
   let host = reg.exec(url)[2];
   let p = '/'+ reg.exec(url)[3];
   let h = reg.exec(url)[1];
+  steal(h, host, p, (img)=>{
+    ress.write(img);
+    ress.end();
+  });
+  
+});
+
+let steal = function(h, host, p, cb){
   let rq;
     var option={
     hostname:host,
     path:p,
     headers:{
       'Referer':'https://www.manhuafen.com'
-      
+
     }
   };
   if(h == 's')
- rq = https.get(option,function(res){
-  var chunks = [];
-  var img;
+  rq = https.get(option,function(res){
+  let chunks = [];
+  let img;
   res.on('data',function(chunk){
     chunks.push(chunk);
   });
   res.on('end',function(){
     img = Buffer.concat(chunks);
-    ress.write(img);
-    ress.end();
+    cb(img);
   });
   });
   else 
   rq = http.get(option,function(res){
-    var chunks = [];
-    var img;
+    let chunks = [];
+    let img;
     res.on('data',function(chunk){
       chunks.push(chunk);
     });
     res.on('end',function(){
       img = Buffer.concat(chunks);
-      ress.write(img);
-      ress.end();
+      cb(img);
     });
     });
   rq.on("error", function(e){
+  console.log(e);
 	console.log("###########################req gg#######################");
 	rq.end();	
 });
@@ -243,7 +276,7 @@ app.get('/img', function(req, ress) {
 		rq.end();
 	});
   rq.end();
-});
+};
 
 
 app.post('/search', function(req, res) {
@@ -275,6 +308,7 @@ app.post('/search', function(req, res) {
           link = $(this).find("img").attr("src");
           manga.name = $(this).find("a.image-link").attr("title");
           manga.link = $(this).find("a.image-link").attr("href");
+          manga.ori = link;
           
           if (link.search(reg) == -1)
           {manga.pic = link;}
@@ -316,7 +350,7 @@ app.post('/seen', function(req, res) {
   });
 });
 
-var server = app.listen(80, function () {
+var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
     console.log(`应用实例，访问地址为 http://${ host==='::'?'localhost':host}:${port}`);
