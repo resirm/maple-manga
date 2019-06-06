@@ -300,7 +300,7 @@ app.post('/seen', function(req, res) {
     ress.forEach(time_res => {
      // console.table(time_res);
       if(time_res.update_time !== time_res.seen_time){
-        const UPDATE_SEEN_TIME = `UPDATE subscription SET seen_time = '${ time_res.update_time }' WHERE manga_id = ${ m_id };`;
+        const UPDATE_SEEN_TIME = `UPDATE subscription SET seen_time = '${ time_res.update_time }' WHERE manga_id = ${ m_id } AND user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usrname }');`;
         con.query(UPDATE_SEEN_TIME, (err, upres, fields) => {
           if(err){
             console.log(`Error occurred when trying to update seen_time information from database: ${err.message}`);
