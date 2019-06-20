@@ -1,20 +1,16 @@
 'use strict';
 var express = require('express')
 var bodyParser = require("body-parser"); 
-var app = express()
+var app = express();
 var path = require('path')
 var cheerio = require('cheerio');
 var https = require('https');
 var session = require('express-session');
-var http = require('http')
-var fs = require('fs')
-const mysql = require('mysql')
-var con = mysql.createConnection({
-    host: 'localhost',
-    user: 'ta78na',
-    password: 'Ch1Ch2ch#',
-    database: 'maple',
-});
+var http = require('http');
+var fs = require('fs');
+var db = require('./db');
+var svc = require('./service');
+
 
 let check_update_interval = 3600000;
 
@@ -42,61 +38,16 @@ app.get('/', (req, res) => {
     res.end();
     return;
   }
-  const USER_VERIFY = `SELECT user_id FROM user WHERE user_name = '${ usr }';`;
-  con.query(USER_VERIFY, (err, ress, fields) => {
-    if(err){
-      console.log(`Error occurred when trying to get user information from database: ${err.message}`);
-      return;
-    }
-    if(ress.length === 0){
+  db.queryUser(usr, (qres) => {
+    if (qres.length === 0){
       res.render('regist');
       res.end();
-    }else{
-      show_home(req, res, usr);
+    }
+    else{
+      svc.showHome(req, res, usr);
     }
   });
 });
-
-let show_home = function (req,res, usr){
-  req.session.userName = usr;
-  // sql1: select m.* from subscription as sub join user as u join manga as m where sub.user_id = u.user_id and u.user_name          = 'ta78na' and sub.manga_id = m.manga_id;
-  // sql2: select * from manga as m where m.manga_id in (select sub.manga_id from subscription as sub join user as u where           sub.user_id = u.user_id and u.user_name = 'ta78na');
-  // use sql2;
-  const query_subscription = `SELECT * FROM manga AS m WHERE m.manga_id IN (SELECT sub.manga_id FROM subscription AS sub JOIN user AS u WHERE sub.user_id = u.user_id AND u.user_name = '${ usr }');`;
-  
-  let mangas;
-  con.query(query_subscription, (err, ress, fields) => {
-    if(err){
-      console.log(`Error occurred when trying to get subscription information from database: ${err.message}`);
-      return;
-    }
-    const QUERY_SUB_NEW = `SELECT sub.manga_id FROM subscription as sub JOIN manga AS m WHERE sub.user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usr }') AND m.manga_id = sub.manga_id and m.update_time <> sub.seen_time;`
-    con.query(QUERY_SUB_NEW, (err, resss, fields) => {
-      if(err){
-        console.log(`Error occurred when trying to get subscription information from database: ${err.message}`);
-        return;
-      }
-      let updated = [];
-      resss.forEach(manga => {
-        console.log(manga);
-        updated.push(manga.manga_id);
-      });
-      console.log(updated);
-      ress.forEach(manga => {
-        if(updated.indexOf(manga.manga_id) != -1){
-          manga.update = true;
-        }else{
-          manga.update = false;
-        }
-        console.log(manga.manga_id, manga.update);
-      });
-      ress.sort((a, b) => b.update - a.update);
-      console.log(ress, typeof ress);
-      mangas = ress;
-      res.render('index',{usr, mangas});
-    })
-  });
-}
 
 //########################添加订阅##########################
 app.post('/result' , function(req,res){
@@ -108,27 +59,19 @@ app.post('/result' , function(req,res){
     let r1 = /^http(s)?:\/\/(.*?)\/(.*)/
     
     let ms = 'img/' + re.exec(mlink)[2] + ".jpg";
-    
-    let query_manga = 'select * from manga where manga_name="' + mname +'"';
-    con.query(query_manga, (err, resss) => {
-      if(err){
-        console.log('[QUERY ERROR] - ',err.message);
-        return;
-      }
-      //获取漫画id
-      console.log(mname);
-      let qmanga_id = 'select manga_id from manga where manga_name="' + mname + '"';
-      if(resss.length == 0){ //没有则插入
+    db.queryManga(mname, (mqres) => {
+      //没有则插入
+      if (mqres.length == 0) {
         if(mcover.search(r1) == -1)
-      {
+        {
           ms = mcover;
-      } else {
+        } else {
         console.log(mcover);
         let host = r1.exec(mcover)[2];
         let p  = '/'+ r1.exec(mcover)[3];
         let h = r1.exec(mcover)[1];
        
-        steal(h, host, p, (img) => {
+        svc.steal(h, host, p, (img) => {
             fs.open('res/' + ms,'w',(err, fd) => {
               fs.write(fd, img,(err)=>{
                   if(err)
@@ -139,58 +82,18 @@ app.post('/result' , function(req,res){
                   fs.close(fd,()=>{});
               });
             });
-        } );
-      }
-        let mangaaddsql = 'insert into manga(manga_id, manga_name, url, cover_url, update_time) values(null,?,?,?,?)';
-        let mangapara = [mname, mlink, ms,"time"];
-        con.query(mangaaddsql,mangapara, function (err, re){
-          if(err){
-            console.log('[INSERT ERROR] - ',err.message);
-            return;
+          });
           }
-          // 订阅
-          subscibe(qmanga_id, username);
-        });
-      }else{
-        // 订阅
-        subscibe(qmanga_id, username);
+        db.newManga(mname, mlink, ms);
+        svc.subscribe(mname, username);
       }
+      else{
+        svc.subscribe(mname, username);
+      } 
     });
     res.send("nice");
 });
 
-let subscibe = function (qm_id, username){
-  con.query(qm_id, (err, ress) => {
-    if(err){
-      console.log('[QUERY ERROR] - ',err.message);
-      return;
-     }
-    console.log(ress);
-    let mangaid =  ress[0].manga_id;
-
-    //获取用户id
-    let quser = 'select user_id from user where user_name="' + username + '"';
-    con.query(quser, (err, result) => {
-      if(err){
-        console.log('[QUERY ERROR] - ',err.message);
-        return;
-      } 
-      // debug
-      //console.table(result);
-      let usrid = result[0].user_id;
-    
-      //插入订阅
-      let subaddsql = 'insert into subscription (user_id, manga_id, seen_time) values(?,?,?)';
-      let subpara = [usrid, mangaid, "test"];
-      con.query(subaddsql,subpara, (err, res) => {
-        if(err){
-          console.log('[INSERT ERROR] - ',err.message);
-          return;
-        } 
-      });
-    });
-  });
-};
 
 app.get('/regist', function(req, res) {
   res.render('regist');
@@ -204,16 +107,7 @@ app.post('/registHandle', function(req, res) {
   if (upass != "daddyplease")
   res.send("SB, GET OUT OF HERE!");
   else{
-    let newuser = `insert into user values(null,"${uname}","${uemail}")`;
-    con.query(newuser, (err, ress) => {
-      if(err){
-        console.log(`Error occurred when trying to insert new user: ${err.message}`);
-        res.send("失败，用户名重复");
-        return;
-      }
-        res.send("注册成功，baby");
-      console.log(`new user: "${uname}"`);
-    });
+    db.newUser(uname, uemail, res);
   }
   
 });
@@ -225,58 +119,12 @@ app.get('/img', function(req, ress) {
   let host = reg.exec(url)[2];
   let p = '/'+ reg.exec(url)[3];
   let h = reg.exec(url)[1];
-  steal(h, host, p, (img)=>{
+  svc.steal(h, host, p, (img)=>{
     ress.write(img);
     ress.end();
   });
   
 });
-
-let steal = function(h, host, p, cb){
-  let rq;
-    var option={
-    hostname:host,
-    path:p,
-    headers:{
-      'Referer':'https://www.manhuafen.com'
-
-    }
-  };
-  if(h == 's')
-  rq = https.get(option,function(res){
-  let chunks = [];
-  let img;
-  res.on('data',function(chunk){
-    chunks.push(chunk);
-  });
-  res.on('end',function(){
-    img = Buffer.concat(chunks);
-    cb(img);
-  });
-  });
-  else 
-  rq = http.get(option,function(res){
-    let chunks = [];
-    let img;
-    res.on('data',function(chunk){
-      chunks.push(chunk);
-    });
-    res.on('end',function(){
-      img = Buffer.concat(chunks);
-      cb(img);
-    });
-    });
-  rq.on("error", function(e){
-  console.log(e);
-	console.log("###########################req gg#######################");
-	rq.end();	
-});
-	rq.on("timeout",() => { 
-		console.log("###############time out###############");
-		rq.end();
-	});
-  rq.end();
-};
 
 
 app.post('/search', function(req, res) {
@@ -328,25 +176,14 @@ app.post('/seen', function(req, res) {
   var usrname = req.session.userName;
   console.log(req.session.userName);
   var m_id = req.body.m_id;
-  const CHECK_UPDATE_TIME = `SELECT m.update_time, sub.seen_time FROM subscription as sub JOIN manga AS m WHERE sub.user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usrname }') AND m.manga_id = sub.manga_id AND m.manga_id = ${ m_id };`;
-  con.query(CHECK_UPDATE_TIME, (err, ress, fields) => {
-    if(err){
-      console.log(`Error occurred when trying to get seen_time information from database: ${err.message}`);
-      return;
-    }
-    ress.forEach(time_res => {
-     // console.table(time_res);
-      if(time_res.update_time !== time_res.seen_time){
-        const UPDATE_SEEN_TIME = `UPDATE subscription SET seen_time = '${ time_res.update_time }' WHERE manga_id = ${ m_id } AND user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usrname }');`;
-        con.query(UPDATE_SEEN_TIME, (err, upres, fields) => {
-          if(err){
-            console.log(`Error occurred when trying to update seen_time information from database: ${err.message}`);
-            return;
-          }
+  db.checkSeen(usrname, m_id, (qres) => {
+    qres.forEach(time_res => {
+      if(time_res.update_time !== time_res.seen_time) {
+        db.updateSeen(usrname, m_id, time_res.update_time, (upres) => {
           console.log(`updated seen_time for manga_id: ${ m_id }.`);
         });
-      }
-    })
+    }
+    });
   });
 });
 
@@ -364,14 +201,9 @@ function check() {
     con.connect();
   }
   console.log(con.state);
-  const QUERY = 'SELECT * FROM manga;';
   let mangas;
-  con.query(QUERY, (err, res, fields) => {
-    if(err){
-      console.log(`Error occurred when trying to get manga information from database: ${err.message}`);
-      return;
-    }
-    mangas = res;
+  db.allManga((gres) => {
+    mangas = gres;
     mangas.forEach(manga => {
       let rqq = https.get(manga.url, function(res){
         var chunks = [];
@@ -385,24 +217,18 @@ function check() {
             var data = Buffer.concat(chunks, size);
             var html = data.toString();
             var $ = cheerio.load(html);
-            
             let update_time = $("span.zj_list_head_dat").text();
             console.log(`update_time: ${update_time}`);
             if (update_time !== manga.update_time){
-              const UPDATE = `UPDATE manga set update_time = "${update_time}" WHERE manga_id = ${manga.manga_id};`;
               console.log(UPDATE);
               console.log(`${manga.manga_name} updated at: ${update_time}.`)
               console.log(update_time);
-              con.query(UPDATE, (err, res, fields) => {
-                if(err){
-                  console.log(`Error occurred when trying to get manga information from database: ${err.message}`);
-                  return;
-                }
-              //  console.table(res);
-              })
+              db.mangaUpdate(manga.manga_id, update_time,()=>{});
             }
           });
-        }).on('error', (e) => {
+        });
+
+      rqq.on('error', (e) => {
           // 处理error
           console.log(`get update error: ${e.message}`);
           check_update_interval = 60000;
