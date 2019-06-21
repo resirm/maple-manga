@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+        <title>Maple Manga</title>
+
+<link href="css/comic-discuss-phone.css" rel="stylesheet">
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/common.css" rel="stylesheet">     
+
+<body class="clearfix">
+
+<div class="page-main">
+    <div class="Introduct">
+
+        <div class="Introduct_Sub autoHeight">
+            <div class="pic" id="Cover">
+            <img src="<%= cover %>" width="100%">
+            </div>
+            <div class="sub_r autoHeight">
+            <p class="txtItme"><%= title %></p>
+            <p class="btnItem">
+            <a class="Btn fl" id="subscribe">收藏漫画</a>
+            <a class="Btn right" >开始观看</a></p>
+            </div>
+        </div>
+
+        <div class="img_001 globalPadding globaltop10 globalbottom10">
+            <div id="list_block">
+                <!-- Begin -->
+                <% for (var chapter in chapters) { %>
+                <div class="comic-chapters">
+                    <div class="chapter-category Sub_H2 autoHeight">
+                        <div class="caption pull-left"><span class="icon Icon9"></span><span class="Title"><%= chapters[chapter].name %></span>
+                        </div>
+                    
+                    </div>
+                    <div class="chapter-body clearfix">
+                        <div class="chapter-warp">
+                            <ul id="chapter-list-<%= chapters[chapter].num %>"  class="Drama">
+                                    <% for (var hua in chapters[chapter].list) { %>
+                                <li>
+                                    <a href="<%= chapters[chapter].list[hua].link %>" >
+                                        <span><%= chapters[chapter].list[hua].name %></span>
+                                    </a>
+                                </li>
+                                <% } %>
+                            </ul>
+                        </div>
+                        <a href="javascript:;" class="extend" title="全部展开" data-key="<%= chapters[chapter].num %>" ><span>•••</span></a>         
+                    </div>
+                </div>
+                <!-- End -->
+                <% } %>
+            </div>
+            
+        </div>
+
+    </div>
+</div>
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap.js"></script>
+<script>
+        
+        $('.extend').click(function (e) {
+            var $this = $(this);
+            var key = $this.data('key');
+            $('#chapter-list-' + key).addClass('extended');
+            $this.hide();
+        });
+    
+    </script>
+</body></html>

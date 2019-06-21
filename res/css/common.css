@@ -1561,7 +1561,7 @@ button, input, select, textarea {
 
 .mode-pagination #panel-title{display: block!important;position: relative;}
 .mode-pagination #m_r_bottom{
-    height: 48px;
+    height: 42px;
     display: block!important;
     position: relative;
 }

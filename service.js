@@ -87,3 +87,51 @@ exports.steal = function(h, host, p, cb){
 	});
   rq.end();
 };
+
+// ############################## update #############################
+let check_update_interval = 3600000;
+let update_checker = setInterval(check, check_update_interval);
+
+function check() {
+  let mangas;
+  db.allManga((gres) => {
+    mangas = gres;
+    mangas.forEach(manga => {
+      let rqq = https.get(manga.url, function(res){
+        var chunks = [];
+        var size = 0;
+        res.on('data', function(chunk){
+            chunks.push(chunk);
+            size += chunk.length;
+        });
+        
+        res.on('end', function(){
+            var data = Buffer.concat(chunks, size);
+            var html = data.toString();
+            var $ = cheerio.load(html);
+            let update_time = $("span.zj_list_head_dat").text();
+            console.log(`update_time: ${update_time}`);
+            if (update_time !== manga.update_time){
+              console.log(UPDATE);
+              console.log(`${manga.manga_name} updated at: ${update_time}.`)
+              console.log(update_time);
+              db.mangaUpdate(manga.manga_id, update_time,()=>{});
+            }
+          });
+        });
+
+      rqq.on('error', (e) => {
+          // 处理error
+          console.log(`get update error: ${e.message}`);
+          check_update_interval = 60000;
+          console.log(`reset check_update_interval: ${check_update_interval}`);
+          clearInterval(update_checker)
+          update_checker = setInterval(check, check_update_interval);
+        });
+    });
+    check_update_interval = 3600000;
+    console.log(`reset check_update_interval: ${check_update_interval}`);
+    clearInterval(update_checker)
+    update_checker = setInterval(check, check_update_interval);
+  });
+};
