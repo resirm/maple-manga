@@ -10,7 +10,7 @@ router.manga = function(req, ress, next) {
     let cover = req.query.c;
     let title = req.query.t;
     let chapters = [];
-    http.get(url, function(res){
+    let rq = http.get(url, function(res){
         let chunks = [];
         let size = 0;
         res.on('data', function(chunk){
@@ -49,6 +49,11 @@ router.manga = function(req, ress, next) {
            
         });   
         });
+        rq.on("error", function(e){
+              console.log(e);
+              console.log("###########################req gg#######################");
+              router.manga(req,ress,next);
+          });
 }
     
 module.exports = router;

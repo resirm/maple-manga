@@ -1,5 +1,5 @@
 'use strict';
-
+var cheerio = require('cheerio');
 var http = require('http')
 var https = require('https');
 var db = require("./db");
@@ -34,11 +34,12 @@ exports.showHome = function (req, res, usr){
         }
         console.log(manga.manga_id, manga.update);
       });
-    });
-    ress.sort((a, b) => b.update - a.update);
+      ress.sort((a, b) => b.update - a.update);
       console.log(ress, typeof ress);
       mangas = ress;
       res.render('index',{usr, mangas});
+    });
+      
   });
 }
 
@@ -112,7 +113,7 @@ function check() {
             let update_time = $("span.zj_list_head_dat").text();
             console.log(`update_time: ${update_time}`);
             if (update_time !== manga.update_time){
-              console.log(UPDATE);
+              
               console.log(`${manga.manga_name} updated at: ${update_time}.`)
               console.log(update_time);
               db.mangaUpdate(manga.manga_id, update_time,()=>{});
