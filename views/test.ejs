@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>Maple Manga</title>
+ 
+    <link href="css/bootstrap.css" rel="stylesheet">
+   
+<body>
+    
+  
+
+    <% for (var c in chapters) { %>
+       
+<img  class="img-responsive center-block" src="img/?url=<%= chapters[c] %>" >
+
+    <% } %>
+    <div style="text-align:center">
+        <br/><br/><br/><br/><br/><br/>
+        <button class="btn-primary btn" >上一话</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="btn-primary btn" >下一话</button>                 
+      </div>
+      <br/><br/><br/><br/><br/><br/><br/><br/>
+
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap.js"></script>
+</body></html>
+
+
