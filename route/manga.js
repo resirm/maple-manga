@@ -90,8 +90,13 @@ router.page = function(req, ress){
             	if (text.match('chapterImages'))
             	{
                     eval(text);
+                    let preu = "page?url=" + pageUrl + prevChapterData.id + ".html";
+                    let nextu;
+                    if(nextChapterData.id != null)
+                        nextu = "page?url=" + pageUrl + nextChapterData.id + ".html";
+                    else nextu = "#";
                     let murls = decrypto(chapterImages);
-                    
+                    let title = pageTitle;
                     let ul;
                     eval("ul = " + murls);
                     ul.forEach(element => {
@@ -102,7 +107,7 @@ router.page = function(req, ress){
                     });
 
                     // console.log(chapters);
-                    ress.render('test', {chapters});
+                    ress.render('test', {chapters, preu, nextu, title});
             		
             	}
             });

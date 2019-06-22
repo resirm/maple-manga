@@ -9,7 +9,7 @@
    
 <body>
     
-  
+    <h1 style="text-align:center"><%= title %></h1>
 
     <% for (var c in chapters) { %>
        
@@ -18,8 +18,8 @@
     <% } %>
     <div style="text-align:center">
         <br/><br/><br/><br/><br/><br/>
-        <button class="btn-primary btn" >上一话</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn-primary btn" >下一话</button>                 
+        <a href="<%= preu %>" class="btn-primary btn" >上一话</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="<%= nextu %>" class="btn-primary btn" >下一话</a>                 
       </div>
       <br/><br/><br/><br/><br/><br/><br/><br/>
 
