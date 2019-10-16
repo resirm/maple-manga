@@ -22,3 +22,5 @@ Manga subscriptions management.
  3.记录位置
  
  4.优化加载
+ 
+ 5.图片链接存在字符问题
