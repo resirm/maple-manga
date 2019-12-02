@@ -101,9 +101,9 @@ router.page = function(req, ress){
                     eval("ul = " + murls);
                     ul.forEach(element => {
                         if( chapterPath == "")
-                        chapters.push(element);
+                        chapters.push(encodeURI(element));
                         else
-                        chapters.push(prefix + chapterPath + element);
+                        chapters.push(encodeURI(prefix + chapterPath + element));
                     });
 
                     // console.log(chapters);
