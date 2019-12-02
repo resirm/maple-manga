@@ -16,7 +16,7 @@ decrypto = function(chapterImages){
 
 
 router.manga = function(req, ress, next) {
-    let url = req.query.id;
+    let url = req.query.id.replace("www","m");
     let cover = req.query.c;
     let title = req.query.t;
     let chapters = [];
@@ -32,19 +32,19 @@ router.manga = function(req, ress, next) {
             let data = Buffer.concat(chunks, size);
             let html = data.toString();
             let $ = cheerio.load(html);
-            let lis = $("div.zj_list");
+            let lis = $("div.comic-chapters");
             let i = 1;
             lis.each((i,t) => {
-                if($(t).find("h2").html() != null)
+                if($(t).find("span.Title").html() != null)
                 {
                     let chapter = {};
-                    chapter.name = $(t).find("h2").text();
+                    chapter.name = $(t).find("span.Title").text();
                     chapter.num = i;
                     let cpt = [];
                     console.log("##########################################")
                     $(t).find("li").each((j ,k) => {
                         let hua = {};
-                        hua.name = $(k).find("a").attr("title");
+                        hua.name = $(k).find("span").text();
                         hua.link = "https://www.manhuafen.com"+ $(k).find("a").attr("href");
                         cpt.push(hua);
                     });
@@ -70,8 +70,8 @@ router.page = function(req, ress){
     let url = req.query.url;
     // var url = 'https://m.manhuafen.com/comic/2237/173474.html';
     let chapters = [];
-    let prefix = "https://mhcdn.333dm.com/"
-    http.get(url, function(res){
+    let prefix = "https://mhcdn.manhuazj.com/"
+    let rq = http.get(url, function(res){
         let chunks = [];
         let size = 0;
         res.on('data', function(chunk){
@@ -113,6 +113,11 @@ router.page = function(req, ress){
             });
         });   
         });
+	rq.on("error", function(e){
+              console.log(e);
+              console.log("###########################req gg#######################");
+              router.page(req,ress);
+          });
 
 }
     
