@@ -1,7 +1,9 @@
 var cheerio = require('cheerio');
 var express = require("express");
+var db = require('../db');
 var CryptoJS = require('../res/js/crypto-js');
 var router = express.Router();
+var svc = require('../service');
 
 var http = require('https');
 
@@ -16,7 +18,22 @@ decrypto = function(chapterImages){
 
 
 router.manga = function(req, ress, next) {
-    let url = req.query.id.replace("www","m");
+    // 
+    let username = req.session.userName;
+    let bookmark = "未观看"
+    let toChapter = "#"
+    if(username =! undefined){
+        let mangaId = req.query.id;
+        req.session.mangaId = mangaId;
+        db.queryBookmark(req.session.userName, mangaId, (bookres) => {
+            if (bookres.length != 0) {
+                bookmark = "续看" + bookres[0].seen_chapter;
+                toChapter = bookres[0].chapter_url;
+            }
+        });
+    }
+    
+    let url = req.query.url.replace("www","m");
     let cover = req.query.c;
     let title = req.query.t;
     let chapters = [];
@@ -55,7 +72,7 @@ router.manga = function(req, ress, next) {
                 }
             });
             
-            ress.render('manga',{chapters, cover, title});
+            ress.render('manga',{chapters, cover, title, bookmark, toChapter});
            
         });   
         });
@@ -69,6 +86,7 @@ router.manga = function(req, ress, next) {
 router.page = function(req, ress){
     let url = req.query.url;
     // var url = 'https://m.manhuafen.com/comic/2237/173474.html';
+    req.session.m_url = '/page?url=' + url;
     let chapters = [];
     let prefix = "https://mhcdn.manhuazj.com/"
     let rq = http.get(url, function(res){
@@ -120,6 +138,17 @@ router.page = function(req, ress){
           });
 
 }
+
+router.bmk = function(req, ress){
+    let userName = req.session.userName;
+    if(userName != undefined){
+        let reg = /\d+/
+        let cpt = reg.exec(req.body.m_cpt)[0];
+        let mangaId = req.session.mangaId;
+        let cptlink = req.session.m_url;
+        svc.updateBookmark(mangaId, userName, cpt, cptlink);
+    }
+};
     
 module.exports = router;
 

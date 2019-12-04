@@ -8,7 +8,15 @@
     <link href="css/bootstrap.css" rel="stylesheet">
    
 <body>
-    
+    <script type="text/javascript">
+        function see(bookmark) {
+          $.ajax({
+            method: 'post',
+            url: '/bmk',
+            data: bookmark,
+          });
+        }
+    </script>
     <h1 style="text-align:center"><%= title %></h1>
 
     <% for (var c in chapters) { %>
@@ -18,13 +26,15 @@
     <% } %>
     <div style="text-align:center">
         <br/><br/><br/><br/><br/><br/>
-        <a href="<%= preu %>" class="btn-primary btn" >上一话</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="<%= preu %>"  class="btn-primary btn" >上一话</a>&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="<%= nextu %>" class="btn-primary btn" >下一话</a>                 
       </div>
       <br/><br/><br/><br/><br/><br/><br/><br/>
-
 <script src="js/jquery.js"></script>
 <script src="js/bootstrap.js"></script>
+<script>
+        see({m_cpt: '<%= title %>'})
+    </script>
 </body></html>
 
 

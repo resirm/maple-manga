@@ -14,6 +14,19 @@ exports.subscribe = function (mangaName, userName){
   });
 };
 
+exports.updateBookmark = function(mangaId, userName, chapter, chapterLink){
+  db.queryBookmark(userName, mangaId, (res) => {
+    if (res.length == 0) {
+      db.queryUser(userName, (res)=>{
+        let usr_id = res[0].user_id;
+        db.newBookmark(usr_id, mangaId, chapter, chapterLink);
+      });
+    } else {
+      db.updateBookmark(userName, mangaId, chapter, chapterLink);
+    }
+  });
+};
+
 exports.showHome = function (req, res, usr){
   req.session.userName = usr;
   db.querySub(usr, (ress) => {

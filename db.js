@@ -133,3 +133,34 @@ exports.mangaUpdate = function(mangaId, time, cb){
 
   });
 }
+
+exports.queryBookmark =  function(usrname, mangaId, cb){
+  let sql = `SELECT * from bookmark WHERE manga_id = ${ mangaId } AND user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usrname }');`;
+  con.query(sql, (err, res) => {
+    if(err){
+      console.log(`Error occurred when trying to query bookmark information from database: ${err.message}`);
+      return;
+    }
+    cb(res);
+  });
+}
+
+exports.newBookmark =  function(usrId, mangaId, cpt, cptlink){
+  let sql = `insert into bookmark values("${usrId}","${mangaId}","${cpt}", "${cptlink}")`;
+  con.query(sql, (err, res) => {
+    if(err){
+      console.log(`Error occurred when trying to query bookmark information from database: ${err.message}`);
+      return;
+    }
+  });
+}
+
+exports.updateBookmark =  function(usrname, mangaId, cpt, cptlink){
+  let sql = `UPDATE bookmark SET seen_chapter = '${ cpt }', chapter_url = '${ cptlink }' WHERE manga_id = ${ mangaId } AND user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usrname }');`;
+  con.query(sql, (err, res) => {
+    if(err){
+      console.log(`Error occurred when trying to update seen_time information from database: ${err.message}`);
+      return;
+    }
+  });
+}

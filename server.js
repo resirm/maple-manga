@@ -36,6 +36,7 @@ app.post('registHandle', mrt.registHandle);
 // Manga Page
 app.get('/manga', mangapage.manga);
 app.get('/page',mangapage.page);
+app.post('/bmk',mangapage.bmk);
 
 var server = app.listen(80, function () {
     var host = server.address().address;
