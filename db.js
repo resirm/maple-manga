@@ -52,6 +52,17 @@ exports.queryManga = function(mangaName, cb){
   });
 }
 
+exports.queryMangaFromId = function(mangaId, cb){
+  let sql = 'select * from manga where manga_id="' + mangaId +'"';
+  con.query(sql, (err, res) => {
+    if(err){
+      console.log('[QUERY ERROR] - ',err.message);
+      return;
+    }
+    cb(res);
+  });
+}
+
 
 exports.newManga = function(mangaName, link, cover){
   let sql = 'insert into manga(manga_id, manga_name, url, cover_url, update_time) values(null,?,?,?,?)';
@@ -93,6 +104,17 @@ exports.checkSeen = function(usrname, mangaId, cb){
   con.query(sql, (err, res) => {
     if(err){
       console.log(`Error occurred when trying to get seen_time information from database: ${err.message}`);
+      return;
+    }
+    cb(res);
+  });
+}
+
+exports.checkMangaSub = function(mangaId, cb){
+  let sql = `SELECT * from subscription where manga_id = ${ mangaId }`
+  con.query(sql, (err, res) =>{
+    if(err){
+      console.log(`Error occurred when trying to get manga information from database: ${err.message}`);
       return;
     }
     cb(res);
@@ -164,3 +186,39 @@ exports.updateBookmark =  function(usrname, mangaId, cpt, cptlink){
     }
   });
 }
+
+exports.deleteBookmark = function(usrname, mangaId, cb){
+  let sql = `DELETE from bookmark WHERE manga_id = ${ mangaId } AND user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usrname }');`;
+  con.query(sql, (err, res) => {
+    if(err){
+      console.log(`Error occurred when trying to update seen_time information from database: ${err.message}`);
+      return;
+    }
+    cb(res);
+  });
+}
+
+exports.deleteSub = function(usrname, mangaId, cb){
+  let sql = `DELETE from subscription WHERE manga_id = ${ mangaId } AND user_id = (SELECT u.user_id FROM user AS u WHERE u.user_name = '${ usrname }');`;
+  con.query(sql, (err, res) => {
+    if(err){
+      console.log(`Error occurred when trying to update seen_time information from database: ${err.message}`);
+      return;
+    }
+    cb(res);
+  });
+}
+
+exports.deleteManga = function(mangaId){
+  let sql = `DELETE from manga WHERE manga_id = ${ mangaId };`;
+  con.query(sql, (err, res) => {
+    if(err){
+      console.log(`Error occurred when trying to update seen_time information from database: ${err.message}`);
+      return;
+    }
+  });
+}
+
+
+
+

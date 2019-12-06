@@ -150,5 +150,17 @@ router.bmk = function(req, ress){
     }
 };
     
+router.subcancel = function(req, ress){
+    let userName = req.session.userName;
+    if (userName == undefined){
+        ress.send("未登录");
+    } else {
+        let mangaId = req.session.mangaId;
+        svc.subscribeCancel(mangaId, userName, ()=>{
+        ress.send("取消成功");
+        });
+    }
+
+}
 module.exports = router;
 

@@ -3,6 +3,7 @@ var cheerio = require('cheerio');
 var http = require('http')
 var https = require('https');
 var db = require("./db");
+var fs=require('fs');
 
 exports.subscribe = function (mangaName, userName){
   db.queryManga(mangaName, (res) => {
@@ -13,6 +14,30 @@ exports.subscribe = function (mangaName, userName){
     });
   });
 };
+
+exports.subscribeCancel = function (mangaId, userName, cb){
+    db.deleteBookmark(userName, mangaId, () => {
+      db.deleteSub(userName, mangaId, () => {
+        cb();
+        db.checkMangaSub(mangaId, (ress) =>{
+          if (ress.length == 0){
+            db.queryMangaFromId(mangaId, (resss)=>{
+              let cover = resss[0].cover_url;
+              fs.unlink('res/' + cover, function(error){
+                if(error){
+                    console.log(error);
+                }
+                console.log('删除文件成功');
+                db.deleteManga(mangaId);
+            });
+            });
+          }
+        });
+      });
+    });
+};
+
+
 
 exports.updateBookmark = function(mangaId, userName, chapter, chapterLink){
   db.queryBookmark(userName, mangaId, (res) => {

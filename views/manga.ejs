@@ -21,6 +21,18 @@
             data: bookmark,
           });
         }
+
+        function subCancel() {
+          $.ajax({
+            method: 'post',
+            url: '/subcancel',
+            data: {},
+            success: function(res){
+              alert(res);
+              window.close();
+            }
+          });
+        }
     </script>
 <div class="page-main">
     <div class="Introduct">
@@ -32,7 +44,7 @@
             <div class="sub_r autoHeight">
             <p class="txtItme"><%= title %></p>
             <p class="btnItem">
-            <a class="Btn fl" id="subscribe">收藏漫画</a>
+            <a class="Btn fl" onclick="subCancel()">取消订阅</a>
             <a class="Btn right" href="<%= toChapter %>" ><%= bookmark %></a></p>
             </div>
         </div>
