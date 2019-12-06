@@ -22,6 +22,7 @@ exports.subscribeCancel = function (mangaId, userName, cb){
         db.checkMangaSub(mangaId, (ress) =>{
           if (ress.length == 0){
             db.queryMangaFromId(mangaId, (resss)=>{
+	      if (resss.length !=0){
               let cover = resss[0].cover_url;
               fs.unlink('res/' + cover, function(error){
                 if(error){
@@ -30,6 +31,7 @@ exports.subscribeCancel = function (mangaId, userName, cb){
                 console.log('删除文件成功');
                 db.deleteManga(mangaId);
             });
+	       }
             });
           }
         });
