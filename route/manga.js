@@ -118,8 +118,12 @@ router.page = function(req, ress){
                     let ul;
                     eval("ul = " + murls);
                     ul.forEach(element => {
-                        if( chapterPath == "")
-                        chapters.push(encodeURI("https://mhimg.eshanyao.com/showImage.php?url="+element));
+                        if( chapterPath == "") {
+                            if (element.indexOf('dmzj') != -1)
+                                chapters.push(encodeURI("https://mhimg.eshanyao.com/showImage.php?url="+element));
+                            else
+                            chapters.push(encodeURI(element));
+                        }
                         else
                         chapters.push(encodeURI(prefix + chapterPath + element));
                     });
