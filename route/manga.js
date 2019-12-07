@@ -118,7 +118,7 @@ router.page = function(req, ress){
                     let ul;
                     eval("ul = " + murls);
                     ul.forEach(element => {
-                        if( chapterPath == "") {
+                        if( chapterPath == "" || element.indexOf('http') != -1) {
                             if (element.indexOf('dmzj') != -1)
                                 chapters.push(encodeURI("https://mhimg.eshanyao.com/showImage.php?url="+element));
                             else
