@@ -26,7 +26,7 @@
           $.ajax({
             method: 'post',
             url: '/subcancel',
-            data: {},
+            data: {mangaId:'<%= mangaId %>'},
             success: function(res){
               alert(res);
               window.close();
@@ -45,7 +45,7 @@
             <p class="txtItme"><%= title %></p>
             <p class="btnItem">
             <a class="Btn fl" onclick="subCancel()">取消订阅</a>
-            <a class="Btn right" href="<%= toChapter %>" ><%= bookmark %></a></p>
+            <a class="Btn right" href="<%= toChapter %>&id=<%= mangaId %>" ><%= bookmark %></a></p>
             </div>
         </div>
 
@@ -64,7 +64,7 @@
                             <ul id="chapter-list-<%= chapters[chapter].num %>"  class="Drama">
                                     <% for (var hua in chapters[chapter].list) { %>
                                 <li>
-                                    <a href="/page?url=<%= chapters[chapter].list[hua].link %>" >
+                                    <a href="/page?url=<%= chapters[chapter].list[hua].link %>&id=<%= mangaId %>" >
                                         <span><%= chapters[chapter].list[hua].name %></span>
                                     </a>
                                 </li>

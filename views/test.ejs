@@ -21,19 +21,19 @@
 
     <% for (var c in chapters) { %>
        
-<img  class="img-responsive center-block" src="https://mhimg.eshanyao.com/showImage.php?url=<%= chapters[c] %>" >
+<img  class="img-responsive center-block" src="<%= chapters[c] %>" >
 
     <% } %>
     <div style="text-align:center">
         <br/><br/><br/><br/><br/><br/>
-        <a href="<%= preu %>"  class="btn-primary btn" >上一话</a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="<%= nextu %>" class="btn-primary btn" >下一话</a>                 
+        <a href="<%= preu %>&id=<%= mangaId %>"  class="btn-primary btn" >上一话</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="<%= nextu %>&id=<%= mangaId %>" class="btn-primary btn" >下一话</a>                 
       </div>
       <br/><br/><br/><br/><br/><br/><br/><br/>
 <script src="js/jquery.js"></script>
 <script src="js/bootstrap.js"></script>
 <script>
-        see({m_cpt: '<%= title %>'})
+        see({m_cpt: '<%= title %>', m_url:'<%= m_url %>', mangaId:'<%= mangaId %>'})
     </script>
 </body></html>
 

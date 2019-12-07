@@ -171,7 +171,7 @@ exports.newBookmark =  function(usrId, mangaId, cpt, cptlink){
   let sql = `insert into bookmark values("${usrId}","${mangaId}","${cpt}", "${cptlink}")`;
   con.query(sql, (err, res) => {
     if(err){
-      console.log(`Error occurred when trying to query bookmark information from database: ${err.message}`);
+      console.log(`Error occurred when trying to add bookmark information from database: ${err.message}`);
       return;
     }
   });

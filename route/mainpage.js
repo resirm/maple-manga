@@ -114,7 +114,7 @@ rt.search =  function(req, res) {
   var mangas = [];
   var m = res;
   var url = 'https://www.manhuafen.com/search/?keywords='+encodeURI(para);
-  console.log(url);
+  // console.log(url);
   
   https.get(url, function(res){
     var chunks = [];
@@ -152,15 +152,15 @@ rt.search =  function(req, res) {
 }
 
 rt.seen =  function(req, res) {
-  console.log(req.session.userName);
+  // console.log(req.session.userName);
   var usrname = req.session.userName;
-  console.log(req.session.userName);
+  // console.log(req.session.userName);
   var m_id = req.body.m_id;
   db.checkSeen(usrname, m_id, (qres) => {
     qres.forEach(time_res => {
       if(time_res.update_time !== time_res.seen_time) {
         db.updateSeen(usrname, m_id, time_res.update_time, (upres) => {
-          console.log(`updated seen_time for manga_id: ${ m_id }.`);
+          // console.log(`updated seen_time for manga_id: ${ m_id }.`);
         });
     }
     });

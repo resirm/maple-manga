@@ -22,6 +22,7 @@ exports.subscribeCancel = function (mangaId, userName, cb){
         db.checkMangaSub(mangaId, (ress) =>{
           if (ress.length == 0){
             db.queryMangaFromId(mangaId, (resss)=>{
+              if (resss.length != 0) {
               let cover = resss[0].cover_url;
               fs.unlink('res/' + cover, function(error){
                 if(error){
@@ -30,6 +31,7 @@ exports.subscribeCancel = function (mangaId, userName, cb){
                 console.log('删除文件成功');
                 db.deleteManga(mangaId);
             });
+          }
             });
           }
         });
@@ -59,10 +61,10 @@ exports.showHome = function (req, res, usr){
     db.queryUpdateSub(usr, (resss) => {
       let updated = [];
       resss.forEach(manga => {
-        console.log(manga);
+        // console.log(manga);
         updated.push(manga.manga_id);
       });
-      console.log(updated);
+      // console.log(updated);
 
       ress.forEach(manga => {
         if(updated.indexOf(manga.manga_id) != -1){
@@ -70,10 +72,10 @@ exports.showHome = function (req, res, usr){
         }else{
           manga.update = false;
         }
-        console.log(manga.manga_id, manga.update);
+        // console.log(manga.manga_id, manga.update);
       });
       ress.sort((a, b) => b.update - a.update);
-      console.log(ress, typeof ress);
+      // console.log(ress, typeof ress);
       mangas = ress;
       res.render('index',{usr, mangas});
     });
@@ -149,11 +151,11 @@ function check() {
             var html = data.toString();
             var $ = cheerio.load(html);
             let update_time = $("span.zj_list_head_dat").text();
-            console.log(`update_time: ${update_time}`);
+            // console.log(`update_time: ${update_time}`);
             if (update_time !== manga.update_time){
               
-              console.log(`${manga.manga_name} updated at: ${update_time}.`)
-              console.log(update_time);
+              // console.log(`${manga.manga_name} updated at: ${update_time}.`)
+              // console.log(update_time);
               db.mangaUpdate(manga.manga_id, update_time,()=>{});
             }
           });
