@@ -88,7 +88,7 @@ router.page = function(req, ress){
     let m_url = '/page?url=' + url;
     let mangaId = req.query.id;
     let chapters = [];
-    let prefix = "https://mhcdn.manhuazj.com/"
+    let prefix = "https://mhimg.eshanyao.com/"
     let rq = http.get(url, function(res){
         let chunks = [];
         let size = 0;
@@ -119,7 +119,7 @@ router.page = function(req, ress){
                     eval("ul = " + murls);
                     ul.forEach(element => {
                         if( chapterPath == "")
-                        chapters.push(encodeURI(element));
+                        chapters.push(encodeURI("https://mhimg.eshanyao.com/showImage.php?url="+element));
                         else
                         chapters.push(encodeURI(prefix + chapterPath + element));
                     });
@@ -143,7 +143,14 @@ router.bmk = function(req, ress){
     let userName = req.session.userName;
     if(userName != undefined){
         let reg = /\d+/
-        let cpt = reg.exec(req.body.m_cpt)[0];
+        let num = reg.exec(req.body.m_cpt);
+        let cpt;
+        if (num.length != 0){
+        cpt = reg.exec(req.body.m_cpt)[0];
+        }
+        else {
+        cpt = req.body.m_cpt;
+        }
         let mangaId = req.body.mangaId;
         let cptlink = req.body.m_url;
         svc.updateBookmark(mangaId, userName, cpt, cptlink);
