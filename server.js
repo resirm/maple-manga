@@ -38,7 +38,7 @@ app.get('/manga', mangapage.manga);
 app.get('/page',mangapage.page);
 app.post('/bmk',mangapage.bmk);
 app.post('/subcancel', mangapage.subcancel);
-var server = app.listen(80, function () {
+var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
     console.log(`应用实例，访问地址为 http://${ host==='::'?'localhost':host}:${port}`);

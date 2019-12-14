@@ -85,7 +85,7 @@ router.manga = function(req, ress, next) {
 router.page = function(req, ress){
     let url = req.query.url;
     // var url = 'https://m.manhuafen.com/comic/2237/173474.html';
-    let m_url = '/page?url=' + url;
+    let m_url = 'page?url=' + url;
     let mangaId = req.query.id;
     let chapters = [];
     let prefix = "https://mhimg.eshanyao.com/"
@@ -117,6 +117,25 @@ router.page = function(req, ress){
                     let title = pageTitle;
                     let ul;
                     eval("ul = " + murls);
+                    if (ul.length > 60) {
+                        let pgnum = req.query.pn;
+                        if (pgnum == undefined)
+                            pgnum = 0;
+                        else {
+                        pgnum = parseInt(pgnum);
+                        if (pgnum > 0)
+                        preu = "page?url=" + url + '&pn=' + (pgnum - 1);
+                        }
+
+                        m_url = 'page?url=' + url + '&pn=' + pgnum;
+                        
+                        if ((pgnum + 1) * 20 < ul.length ){
+                            nextu = "page?url=" + url + '&pn=' + (pgnum + 1);
+                        }
+
+                        ul = ul.slice(pgnum * 20, (pgnum + 1) * 20);
+
+                    }
                     ul.forEach(element => {
                         if( chapterPath == "" || element.indexOf('http') != -1) {
                             if (element.indexOf('dmzj') != -1)
@@ -156,7 +175,7 @@ router.bmk = function(req, ress){
         cpt = req.body.m_cpt;
         }
         let mangaId = req.body.mangaId;
-        let cptlink = req.body.m_url;
+        let cptlink = req.body.m_url.replace('&amp;','&');
         svc.updateBookmark(mangaId, userName, cpt, cptlink);
     }
 };
