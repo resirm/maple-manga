@@ -24,7 +24,7 @@ exports.subscribeCancel = function (mangaId, userName, cb){
             db.queryMangaFromId(mangaId, (resss)=>{
               if (resss.length != 0) {
               let cover = resss[0].cover_url;
-              fs.unlink('res/' + cover, function(error){
+              fs.unlink(__dirname + '/res/' + cover, function(error){
                 if(error){
                     console.log(error);
                 }

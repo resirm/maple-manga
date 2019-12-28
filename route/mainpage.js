@@ -52,7 +52,7 @@ rt.subscribe = function (req,res){
         let h = r1.exec(mcover)[1];
        
         svc.steal(h, host, p, (img) => {
-            fs.open('res/' + ms,'w',(err, fd) => {
+            fs.open(__dirname+'/../res/' + ms,'w',(err, fd) => {
               fs.write(fd, img,(err)=>{
                   if(err)
                   {
