@@ -25,5 +25,3 @@
 |--------|---|---|
 | user_id SMALLINT | manga_id SMALLINT | seen_chapter VARCHAR(255) | chapter_url VARCHAR(255)|
 
-未登录或未看过的用户，显示继续阅读，
-若表中存在记录，则显示继续看xx话并修改链接

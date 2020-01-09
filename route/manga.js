@@ -88,7 +88,7 @@ router.page = function(req, ress){
     let m_url = 'page?url=' + url;
     let mangaId = req.query.id;
     let chapters = [];
-    let prefix = "https://mhimg.eshanyao.com/"
+    let prefix = "/img?url=https://mhimg.eshanyao.com/"
     let rq = http.get(url, function(res){
         let chunks = [];
         let size = 0;
@@ -139,7 +139,7 @@ router.page = function(req, ress){
                     ul.forEach(element => {
                         if( chapterPath == "" || element.indexOf('http') != -1) {
                             if (element.indexOf('dmzj') != -1)
-                                chapters.push(encodeURI("https://mhimg.eshanyao.com/showImage.php?url="+element));
+                                chapters.push(encodeURI("https://zyfdk.herokuapp.com/img?url="+element));
                             else
                             chapters.push(encodeURI(element));
                         }
